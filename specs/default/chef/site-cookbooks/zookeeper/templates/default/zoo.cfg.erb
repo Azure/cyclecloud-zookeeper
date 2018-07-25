@@ -1,0 +1,21 @@
+tickTime=6000
+initLimit=10
+syncLimit=5
+dataDir=<%= node['zookeeper']['data_dir'] %>
+# the port at which the clients will connect
+clientPort=<%= node['zookeeper']['client_port'] %>
+
+<% if node['zookeeper']['mode'] == 'ensemble' -%>
+# For single instance ZooKeeper do not list servers 
+<% if @members.length > 1 -%>
+
+<% @members.each do |member_id, member_ip| -%>
+<% if member_ip == node['cyclecloud']['instance']['ipv4'] %>
+# For current node, bind all interfaces
+server.<%= member_id %>=0.0.0.0:2888:3888
+<% else %>
+server.<%= member_id %>=<%= member_ip %>:2888:3888
+<% end %>
+<% end -%>
+<% end -%>
+<% end -%>

@@ -1,0 +1,173 @@
+###############################
+## Zookeeper Configuration   ##
+###############################
+
+[cluster Zookeeper]
+FormLayout = selectionpanel
+IconUrl = static/cloud/cluster/ui/ClusterIcon/zookeeper-icon.png
+Category = Infrastructure
+
+     [[node defaults]]
+     Credentials = $Credentials    
+     ImageName = $ImageName
+     SubnetId = $SubnetId
+     Region = $Region
+     KeyPairLocation = $KeyPairLocation
+
+         [[[configuration]]]
+         cyclecloud.discoverable = true
+         zookeeper.ensemble_size = $EnsembleSize
+         
+         [[[cluster-init cyclecloud/zookeeper:default:$ProjectVersion]]]
+
+
+     [[node proxy]]
+     IsReturnProxy = $ReturnProxy
+     MachineType = $ProxyMachineType
+
+         [[[configuration]]]
+         run_list = recipe[cganglia::client], recipe[cganglia::server]
+
+         [[[input-endpoint ganglia]]]
+         PrivatePort = 8652
+         PublicPort = 8652
+
+        [[[network-interface eth0]]]
+        AssociatePublicIpAddress = $UsePublicNetwork
+
+         [[[cluster-init cyclecloud/zookeeper:proxy:$ProjectVersion]]]
+         [[[cluster-init cyclecloud/zookeeper:client:$ProjectVersion]]]
+
+     [[nodearray ensemble]]
+     MachineType = $EnsembleMachineType
+     InitialCount = $EnsembleSize
+     AdditionalClusterInitSpecs = $EnsembleClusterInitSpecs
+
+         [[[network-interface]]]
+         AssociatePublicIpAddress = false
+
+         [[[configuration]]]
+	      run_list = recipe[cganglia::client]
+
+         [[[cluster-init cyclecloud/zookeeper:server:$ProjectVersion]]]
+
+
+[parameters About]
+Order = 1
+
+    [[parameters About Zookeeper]]
+
+        [[[parameter ZK]]]
+        HideLabel = true
+        Config.Plugin = pico.widget.HtmlTemplateWidget
+        Config.Template := "<table><tr><td><img src='https://github.com/CycleCloud/zookeeper/raw/master/icon.png' width='192' height='192'></td></tr><tr><td><p>This cluster installs a basic Zookeeper ensemble.</p><br><p>See the <a href=\"https://zookeeper.apache.org/\" target=\"_blank\">Zookeeper project site</a> for an overview.</p></td></tr></table>"
+
+        [[[parameter Readme]]]
+        HideLabel = true
+        Config.Plugin = pico.widget.HtmlTemplateWidget
+        Config.Template := "Follow the instructions in the <a href=\"https://github.com/CycleCloudCommunity/zookeeper/\" target=\"_blank\">README</a> for details on instructions on extending and configuring the Project for your environment."
+
+[parameters Required Settings]
+Order = 10
+
+    [[parameters Virtual Machines ]]
+    Description = "The cluster, in this case, has two roles: the return proxy node and the zookeeper ensemble hosts. Configure which instance types to use based on the requirements of your application.  The proxy host may be used to enable firewall traversal between the cluster and CycleCloud.   In VPC environments with virtual network, this node is not required."
+    Order = 20
+
+        [[[parameter Region]]]
+        Label = Region
+        Description = Deployment Location
+        ParameterType = Cloud.Region
+        DefaultValue = westus2
+
+        [[[parameter ProxyMachineType]]]
+        Label = Proxy
+        Description = The machine type for the optional proxy host
+        ParameterType = Cloud.MachineType
+        DefaultValue = Standard_A2_v2
+
+
+       [[[parameter EnsembleMachineType]]]
+       Label = ZooKeeper
+       Description = The machine type for the ZooKeeper members
+       ParameterType = Cloud.MachineType
+       DefaultValue = Standard_DS4_v2 
+
+
+    [[parameters Networking]]
+    Order = 40
+
+        [[[parameter SubnetId]]]
+        Label = Subnet ID
+        Description = Subnet Resource Path (ResourceGroup/VirtualNetwork/Subnet)
+        ParameterType = Azure.Subnet
+        Required = True
+
+
+[parameters Advanced Settings]
+Order = 20
+
+    [[parameters Azure Settings]]
+    Order = 10 
+
+        [[[parameter Credentials]]]
+        Description = The credentials for the cloud provider
+        ParameterType = Cloud.Credentials
+
+
+     [[parameters Zookeeper]]
+     Description = Adjust the ZooKeeper cluster size.  Ensemble Size >= 3 required for fault tolerance (max: 10).
+     Order = 20
+
+        [[[parameter EnsembleSize]]]
+        Label = Ensemble Size
+        Description = The number of ZooKeeper ensemble members to start initially.  (Quorum Size = ceil(EnsembleSize/2))
+        DefaultValue = 3
+        Config.Plugin = pico.form.NumberTextBox
+        Config.MinValue = 1
+        Config.MaxValue = 10
+        Config.IntegerOnly = true
+
+        [[[parameter ProjectVersion]]]
+        Label = Project Version
+        DefaultValue = 1.6.0
+        Description = Select the Zookeeper project spec version
+        Hidden = true
+
+
+    [[parameters Software]]
+    Description = "Specify the scheduling software, and base OS installed on all nodes, and optionally the cluster-init and chef versions from your Locker."
+    Order = 10
+
+        [[[parameter ImageName]]]
+        Label = Base OS
+        ParameterType = Cloud.Image
+        Config.OS = linux
+        DefaultValue = cycle.image.centos7
+
+        [[[parameter EnsembleClusterInitSpecs]]]
+        Label = Ensemble Cluster-Init Specs
+        Description = Cluster init specs to apply to all nodes
+        ParameterType = Cloud.ClusterInitSpecs
+
+
+    [[parameters Advanced Networking]]
+    Description = Advanced networking settings
+
+        [[[parameter ReturnProxy]]]
+        Label = Return Proxy
+        DefaultValue = false
+        ParameterType = Boolean
+        Config.Label = Use SSH tunnel to connect to CycleCloud (required if direct access is blocked)
+
+        [[[parameter UsePublicNetwork]]]
+        Label = Public Head Node
+        DefaultValue = true
+        ParameterType = Boolean
+        Config.Label = Access master node from the Internet
+
+        [[[parameter KeyPairLocation]]]
+        Label = Keypair Path
+        Description = The path to the private SSH key to use for the `cyclecloud` user on linux nodes.
+        DefaultValue = ~/.ssh/cyclecloud.pem
+        Required = True
