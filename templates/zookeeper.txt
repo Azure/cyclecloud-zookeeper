@@ -4,7 +4,6 @@
 
 [cluster Zookeeper]
 FormLayout = selectionpanel
-IconUrl = https://github.com/Azure/cyclecloud-zookeeper/raw/master/icon.png
 Category = Infrastructure
 
      [[node defaults]]
