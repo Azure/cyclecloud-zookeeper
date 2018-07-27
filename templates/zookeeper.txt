@@ -60,12 +60,13 @@ Order = 1
         [[[parameter ZK]]]
         HideLabel = true
         Config.Plugin = pico.widget.HtmlTemplateWidget
-        Config.Template := "<table><tr><td><img src='https://github.com/Azure/cyclecloud-zookeeper/raw/master/icon.png' width='192' height='192'></td></tr><tr><td><p>This cluster installs a basic Zookeeper ensemble.</p><br><p>See the <a href=\"https://zookeeper.apache.org/\" target=\"_blank\">Zookeeper project site</a> for an overview.</p></td></tr></table>"
+        Config.Template := "<table><tr><td><p>This cluster installs a basic Zookeeper ensemble.</p><br><p>See the <a href=\"https://zookeeper.apache.org/\" target=\"_blank\">Zookeeper project site</a> for an overview.</p></td></tr></table>"
+        # Config.Template := "<table><tr><td><img src='https://github.com/Azure/cyclecloud-zookeeper/raw/master/icon.png' width='192' height='192'></td></tr><tr><td><p>This cluster installs a basic Zookeeper ensemble.</p><br><p>See the <a href=\"https://zookeeper.apache.org/\" target=\"_blank\">Zookeeper project site</a> for an overview.</p></td></tr></table>"
 
-        [[[parameter Readme]]]
-        HideLabel = true
-        Config.Plugin = pico.widget.HtmlTemplateWidget
-        Config.Template := "Follow the instructions in the <a href=\"https://github.com/Azure/cyclecloud-zookeeper/\" target=\"_blank\">README</a> for details on instructions on extending and configuring the Project for your environment."
+        # [[[parameter Readme]]]
+        # HideLabel = true
+        # Config.Plugin = pico.widget.HtmlTemplateWidget
+        # Config.Template := "Follow the instructions in the <a href=\"https://github.com/Azure/cyclecloud-zookeeper/\" target=\"_blank\">README</a> for details on instructions on extending and configuring the Project for your environment."
 
 [parameters Required Settings]
 Order = 10
