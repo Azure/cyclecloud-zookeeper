@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 default['zookeeper']['pkg'] = 'zookeeper-3.4.9'
 default['zookeeper']['home'] = '/opt/zookeeper/current'
 default['zookeeper']['id'] = nil

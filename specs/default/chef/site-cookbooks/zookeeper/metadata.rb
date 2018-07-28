@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 name             'zookeeper'
 maintainer       'Cycle Computing LLC'
 maintainer_email 'suppport@cyclecomputing.com'
