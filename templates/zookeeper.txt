@@ -147,7 +147,7 @@ Order = 20
         DefaultValue = cycle.image.centos7
 
         [[[parameter EnsembleClusterInitSpecs]]]
-        Label = Ensemble Cluster-Init Specs
+        Label = Ensemble Cluster-Init
         Description = Cluster init specs to apply to all nodes
         ParameterType = Cloud.ClusterInitSpecs
 
