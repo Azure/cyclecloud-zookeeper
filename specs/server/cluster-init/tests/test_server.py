@@ -27,6 +27,18 @@ def zk_ready(ip):
 
     return success, stdout, stderr
 
+
+def _retry_call(cmd, attempts=3):
+    for attempt in range(attempts):
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        if process.returncode == 0:
+            return stdout
+        assert attempt < attempts - 1, "Command %s failed %d times.\nStdout: %s\nStderr:\n %s" %\
+                                        (cmd, attempts, stdout, stderr)
+            
+        time.sleep(5 + 15 * attempt)
+
  
 class TestZkServer(unittest.TestCase):
     
@@ -36,7 +48,7 @@ class TestZkServer(unittest.TestCase):
         self.server = '127.0.0.1'
     
     def tearDown(self):
-        subprocess.check_call(['/opt/zookeeper/current/bin/zkCli.sh', '-server', self.server,
+        _retry_call(['/opt/zookeeper/current/bin/zkCli.sh', '-server', self.server,
                                'delete', self.znode])
 
     def test_create_znode(self):
@@ -46,15 +58,10 @@ class TestZkServer(unittest.TestCase):
                         % (stdout, stderr))
         
         magic_string = 'superfoobar'
-        subprocess.check_call(['/opt/zookeeper/current/bin/zkCli.sh', '-server', self.server,
+        _retry_call(['/opt/zookeeper/current/bin/zkCli.sh', '-server', self.server,
                                'create', self.znode, magic_string])
         
-        p = subprocess.Popen(['/opt/zookeeper/current/bin/zkCli.sh', '-server', self.server, 'get',
-                              self.znode], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        get_stdout = _retry_call(['/opt/zookeeper/current/bin/zkCli.sh', '-server', self.server, 'get', self.znode])
         
-        stdout, stderr = p.communicate()
-        self.assertEqual(0, p.returncode,
-                         msg="Create of znode %s failed with stdout: %s\nstderr:%s" % (self.znode, stdout, stderr))
-        
-        self.assertTrue(magic_string in stdout, msg="Expected value %s not found in output %s"
-                        % (magic_string, stdout))
+        self.assertTrue(magic_string in get_stdout, msg="Expected value %s not found in output %s"
+                        % (magic_string, get_stdout))
