@@ -131,7 +131,7 @@ Order = 20
 
         [[[parameter ProjectVersion]]]
         Label = Project Version
-        DefaultValue = 1.6.0
+        DefaultValue = 1.6.1
         Description = Select the Zookeeper project spec version
         Hidden = true
 

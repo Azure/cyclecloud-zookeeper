@@ -8,7 +8,7 @@
 
 include_recipe 'cyclecloud'
 
-mirror = "http://apache.mirrors.tds.net/zookeeper/"
+mirror = "https://archive.apache.org/dist/zookeeper"
 version = '3.4.12'
 checksum = 'c686f9319050565b58e642149cb9e4c9cc8c7207aacc2cb70c5c0672849594b9'
 zk_tarball = "zookeeper-#{version}.tar.gz"
